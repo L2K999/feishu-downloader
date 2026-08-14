@@ -210,6 +210,11 @@
   background-color: #fff;
 }
 
+.debug-url {
+  color: #4A90D9;
+  word-break: break-all;
+}
+
 .settings-btn {
   width: 100%;
   font-size: 28rpx;

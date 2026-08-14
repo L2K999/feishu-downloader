@@ -129,10 +129,18 @@
   <view class="card settings-card">
     <view class="section-title">服务设置</view>
     <view class="settings-info">
-      <text class="text-sm">后端地址：</text>
+      <text class="text-sm">云托管：</text>
+      <text class="text-sm {{useCloud ? 'text-success' : 'text-error'}}">{{useCloud ? '已启用' : '未启用'}}</text>
+    </view>
+    <view wx:if="{{useCloud}}" class="settings-info">
+      <text class="text-sm">云环境：</text>
+      <text class="text-sm debug-url">{{cloudEnvId}}</text>
+    </view>
+    <view class="settings-info">
+      <text class="text-sm">备有地址：</text>
       <input 
         class="settings-input"
-        placeholder="https://your-server.com"
+        placeholder="http://localhost:3000"
         value="{{serverUrlInput}}"
         bindinput="onServerUrlInput"
       />
@@ -147,7 +155,7 @@
       {{connectionStatus}}
     </view>
     <view class="text-muted text-sm mt-sm settings-tip">
-      💡 后端服务负责处理各平台的文档导出，地址由管理员配置
+      💡 云托管模式下小程序无需配置域名白名单。备有地址用于本地调试降级。
     </view>
   </view>
 

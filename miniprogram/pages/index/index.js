@@ -1,4 +1,4 @@
-const { feishuApi, cloudDocApi, downloadHistory } = require('../../utils/api.js');
+const { feishuApi, cloudDocApi, downloadHistory, downloadFile } = require('../../utils/api.js');
 const { parseCloudUrl, getSupportedFormats, SUPPORTED_PLATFORMS } = require('../../utils/util.js');
 
 Page({
@@ -14,14 +14,18 @@ Page({
     supportedPlatforms: [],
     serverUrlInput: '',
     connectionStatus: '',
-    connectionOk: false
+    connectionOk: false,
+    useCloud: false,
+    cloudEnvId: ''
   },
 
   onLoad() {
     var app = getApp();
     this.setData({
       supportedPlatforms: SUPPORTED_PLATFORMS,
-      serverUrlInput: app.globalData.serverUrl
+      serverUrlInput: app.globalData.serverUrl,
+      useCloud: app.globalData.useCloud,
+      cloudEnvId: app.globalData.cloudEnvId
     });
   },
 
@@ -236,18 +240,10 @@ Page({
 
     if (data.downloadUrl || data.fileUrl) {
       const fileUrl = data.downloadUrl || data.fileUrl;
-      const serverUrl = (getApp() && getApp().globalData && getApp().globalData.serverUrl) || 'http://localhost:3000';
-      const fullUrl = fileUrl.startsWith('http') ? fileUrl : serverUrl + fileUrl;
 
       this.setData({ processingStatus: '正在下载文件...' });
 
-      const downloadResult = await new Promise((resolve, reject) => {
-        wx.downloadFile({
-          url: fullUrl,
-          success: resolve,
-          fail: reject
-        });
-      });
+      const downloadResult = await downloadFile(fileUrl);
 
       if (downloadResult.statusCode === 200) {
         const fileName = data.fileName || platform + '_' + token.substring(0, 8) + '.' + format;
@@ -343,22 +339,14 @@ Page({
         throw new Error('导出超时');
       }
 
-      const serverUrl = (getApp() && getApp().globalData && getApp().globalData.serverUrl) || 'http://localhost:3000';
-      const fullUrl = result.downloadUrl.startsWith('http') ? result.downloadUrl : serverUrl + result.downloadUrl;
-      await this.downloadAndSaveFile(fullUrl, platform, format, token);
+      await this.downloadAndSaveFile(result.downloadUrl, platform, format, token);
     }
   },
 
   async downloadAndSaveFile(fileUrl, platform, format, token) {
     this.setData({ processingStatus: '正在下载文件...' });
 
-    const downloadResult = await new Promise((resolve, reject) => {
-      wx.downloadFile({
-        url: fileUrl,
-        success: resolve,
-        fail: reject
-      });
-    });
+    const downloadResult = await downloadFile(fileUrl);
 
     if (downloadResult.statusCode === 200) {
       const fileExt = format === 'docx' ? 'docx' : (format === 'pdf' ? 'pdf' : format);

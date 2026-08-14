@@ -1,32 +1,78 @@
+// 统一请求封装：优先使用微信云托管，备选 wx.request 直连后端
 const request = (options) => {
   return new Promise((resolve, reject) => {
-    const app = getApp();
-    const serverUrl = (app && app.globalData && app.globalData.serverUrl) || 'http://localhost:3000';
-    
-    wx.request({
-      url: serverUrl + options.url,
-      method: options.method || 'GET',
-      data: options.data || {},
-      header: {
-        'content-type': 'application/json',
-        'Authorization': wx.getStorageSync('token') || '',
-        'X-Platform': options.platform || 'feishu'
-      },
-      success: (res) => {
-        if (res.statusCode === 200) {
-          resolve(res.data);
-        } else {
-          reject(res.data);
-        }
-      },
-      fail: (err) => {
-        wx.showToast({
-          title: '网络请求失败',
-          icon: 'none'
-        });
-        reject(err);
+    var app = getApp();
+    var useCloud = app && app.globalData && app.globalData.useCloud;
+    var path = options.url; // 例如 /api/feishu/parse
+    var method = options.method || 'GET';
+    var data = options.data || {};
+
+    var doFail = function (err) {
+      wx.showToast({
+        title: '网络请求失败',
+        icon: 'none'
+      });
+      reject(err);
+    };
+
+    var doSuccess = function (res) {
+      if (res.statusCode === 200 || res.data) {
+        resolve(res.data);
+      } else {
+        reject(res.data);
       }
-    });
+    };
+
+    if (useCloud && wx.cloud && wx.cloud.callContainer) {
+      // 使用微信云托管调用容器服务
+      wx.cloud.callContainer({
+        config: { env: app.globalData.cloudEnvId },
+        path: path,
+        method: method,
+        data: data,
+        header: {
+          'content-type': 'application/json',
+          'X-Platform': options.platform || 'feishu'
+        },
+        success: function (res) {
+          // callContainer 返回结构兼容
+          if (res.statusCode === 200) {
+            resolve(res.data);
+          } else {
+            reject(res.data);
+          }
+        },
+        fail: function (err) {
+          // 云托管失败时，自动降级到 wx.request
+          var serverUrl = app.globalData.serverUrl;
+          wx.request({
+            url: serverUrl + path,
+            method: method,
+            data: data,
+            header: {
+              'content-type': 'application/json',
+              'X-Platform': options.platform || 'feishu'
+            },
+            success: doSuccess,
+            fail: doFail
+          });
+        }
+      });
+    } else {
+      // 直接请求后端地址
+      var serverUrl = (app && app.globalData && app.globalData.serverUrl) || 'http://localhost:3000';
+      wx.request({
+        url: serverUrl + path,
+        method: method,
+        data: data,
+        header: {
+          'content-type': 'application/json',
+          'X-Platform': options.platform || 'feishu'
+        },
+        success: doSuccess,
+        fail: doFail
+      });
+    }
   });
 };
 
@@ -38,7 +84,7 @@ const feishuApi = {
       data: { url }
     });
   },
-  
+
   createExportTask(token, type, format, platform = 'feishu') {
     return request({
       url: '/api/feishu/export',
@@ -47,7 +93,7 @@ const feishuApi = {
       platform
     });
   },
-  
+
   getExportResult(taskId, platform = 'feishu') {
     return request({
       url: '/api/feishu/export/result/' + taskId,
@@ -55,7 +101,7 @@ const feishuApi = {
       platform
     });
   },
-  
+
   getMarkdownContent(token, platform = 'feishu') {
     return request({
       url: '/api/feishu/markdown/' + token,
@@ -63,7 +109,7 @@ const feishuApi = {
       platform
     });
   },
-  
+
   batchExport(items) {
     return request({
       url: '/api/feishu/batch-export',
@@ -71,14 +117,14 @@ const feishuApi = {
       data: { items }
     });
   },
-  
+
   getBatchResult(batchId) {
     return request({
       url: '/api/feishu/batch-result/' + batchId,
       method: 'GET'
     });
   },
-  
+
   downloadFile(fileId, platform = 'feishu') {
     return request({
       url: '/api/feishu/download/' + fileId,
@@ -185,11 +231,10 @@ const googleApi = {
 
 // ==================== 统一平台调度 ====================
 const cloudDocApi = {
-  // 根据平台获取导出 API
   getExportApi(platform) {
     const apiMap = {
       feishu: feishuApi,
-      dingtalk: feishuApi, // 钉钉复用 feishu 路由结构
+      dingtalk: feishuApi,
       notion: notionApi,
       yuque: yuqueApi,
       tencent: tencentApi,
@@ -198,7 +243,6 @@ const cloudDocApi = {
     return apiMap[platform] || feishuApi;
   },
 
-  // 统一导出入口
   async exportDocument(parsedInfo, format) {
     const platform = parsedInfo.platform;
     const token = parsedInfo.token;
@@ -217,9 +261,8 @@ const cloudDocApi = {
         return await notionApi.exportDocument(token, format);
 
       case 'yuque':
-        // 语雀 token 格式: namespace/slug
-        const [ns, slug] = token.split('/');
-        return await yuqueApi.exportDocument(ns, slug, format);
+        var parts = token.split('/');
+        return await yuqueApi.exportDocument(parts[0], parts[1], format);
 
       case 'tencent':
         return await tencentApi.exportDocument(token, parsedInfo.type, format);
@@ -242,29 +285,92 @@ const downloadHistory = {
     wx.setStorageSync('download_history', history);
     return record;
   },
-  
+
   getHistory() {
     return wx.getStorageSync('download_history') || [];
   },
-  
+
   deleteRecord(id) {
     const history = wx.getStorageSync('download_history') || [];
     const newHistory = history.filter(item => item.id !== id);
     wx.setStorageSync('download_history', newHistory);
   },
-  
+
   clearHistory() {
     wx.removeStorageSync('download_history');
   },
-  
+
   updateRecord(id, updates) {
     const history = wx.getStorageSync('download_history') || [];
     const index = history.findIndex(item => item.id === id);
     if (index !== -1) {
-      history[index] = { ...history[index], ...updates };
+      history[index] = Object.assign({}, history[index], updates);
       wx.setStorageSync('download_history', history);
     }
   }
+};
+
+// 文件下载辅助：云托管模式下用 callContainer，否则用 wx.downloadFile
+const downloadFile = (fileUrl) => {
+  return new Promise((resolve, reject) => {
+    var app = getApp();
+    var useCloud = app && app.globalData && app.globalData.useCloud;
+    var isExternal = /^https?:\/\//i.test(fileUrl);
+
+    // 外部链接（如飞书 CDN）：直接用 wx.downloadFile
+    if (isExternal) {
+      wx.downloadFile({
+        url: fileUrl,
+        success: resolve,
+        fail: reject
+      });
+      return;
+    }
+
+    // 服务器相对路径
+    if (useCloud && wx.cloud && wx.cloud.callContainer) {
+      wx.cloud.callContainer({
+        config: { env: app.globalData.cloudEnvId },
+        path: fileUrl,
+        method: 'GET',
+        responseType: 'arraybuffer',
+        success: function (res) {
+          if (res.statusCode === 200 && res.data) {
+            // 将 ArrayBuffer 写入临时文件
+            var fs = wx.getFileSystemManager();
+            var tempPath = wx.env.USER_DATA_PATH + '/dl_' + Date.now();
+            fs.writeFile({
+              filePath: tempPath,
+              data: res.data,
+              encoding: 'binary',
+              success: function () {
+                resolve({ tempFilePath: tempPath, statusCode: 200 });
+              },
+              fail: function (err) { reject(err); }
+            });
+          } else {
+            reject(new Error('下载失败：' + res.statusCode));
+          }
+        },
+        fail: function (err) {
+          // 云托管失败，降级到直连
+          var serverUrl = app.globalData.serverUrl;
+          wx.downloadFile({
+            url: serverUrl + fileUrl,
+            success: resolve,
+            fail: reject
+          });
+        }
+      });
+    } else {
+      var serverUrl = (app && app.globalData && app.globalData.serverUrl) || 'http://localhost:3000';
+      wx.downloadFile({
+        url: serverUrl + fileUrl,
+        success: resolve,
+        fail: reject
+      });
+    }
+  });
 };
 
 module.exports = {
@@ -275,5 +381,6 @@ module.exports = {
   tencentApi,
   googleApi,
   cloudDocApi,
-  downloadHistory
+  downloadHistory,
+  downloadFile
 };
