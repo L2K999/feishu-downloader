@@ -1,0 +1,58 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">选择反馈类型</view>
+    <view class="type-grid">
+      <view 
+        wx:for="{{typeOptions}}" 
+        wx:key="value"
+        class="type-item {{feedbackType === item.value ? 'type-selected' : ''}}"
+        bindtap="selectType"
+        data-value="{{item.value}}"
+      >
+        <view class="type-icon">{{item.icon}}</view>
+        <view class="type-label">{{item.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">反馈内容</view>
+    <view class="text-muted text-sm mb-sm">请详细描述你的建议或遇到的问题（至少5个字）</view>
+    <textarea 
+      class="textarea-field"
+      placeholder="例如：希望支持更多导出格式，或者在使用过程中遇到了xxx问题..."
+      value="{{feedbackContent}}"
+      bindinput="onInputContent"
+      maxlength="500"
+      auto-height
+    />
+    <view class="text-right text-muted text-sm">
+      {{feedbackContent.length}}/500
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">联系方式（选填）</view>
+    <view class="text-muted text-sm mb-sm">如果希望得到回复，请留下联系方式（微信、邮箱等）</view>
+    <input 
+      class="input-field"
+      placeholder="你的联系方式"
+      value="{{contactInfo}}"
+      bindinput="onInputContact"
+    />
+  </view>
+
+  <view class="mt-lg">
+    <button 
+      class="{{submitting ? 'btn-disabled' : 'btn-primary btn-lg'}}"
+      bindtap="submitFeedback"
+      disabled="{{submitting}}"
+    >
+      {{submitting ? '提交中...' : '提交反馈'}}
+    </button>
+  </view>
+
+  <view class="text-center text-muted text-sm mt-lg">
+    所有反馈将直接发送给管理员，我们会认真阅读每一条建议
+  </view>
+</view>

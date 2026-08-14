@@ -1,0 +1,237 @@
+/* 模式切换按钮 - 批量/单链接 */
+.btn-mode-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 16rpx;
+  padding: 28rpx 32rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-mode-switch:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.btn-mode-icon {
+  font-size: 36rpx;
+  margin-right: 16rpx;
+}
+
+.btn-mode-text {
+  flex: 1;
+  text-align: center;
+}
+
+/* 导出格式选择 - 垂直布局 */
+.format-grid {
+  display: flex;
+  flex-direction: column;
+}
+
+.format-option {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 2rpx solid #e9ecef;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  transition: all 0.2s;
+  margin-bottom: 16rpx;
+}
+
+.format-option:last-child {
+  margin-bottom: 0;
+}
+
+.format-option.format-selected {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  border-color: #4A90D9;
+  box-shadow: 0 4rpx 12rpx rgba(74, 144, 217, 0.15);
+}
+
+.format-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.format-info {
+  flex: 1;
+}
+
+.format-label {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+}
+
+.format-desc {
+  font-size: 24rpx;
+}
+
+.format-check {
+  width: 48rpx;
+  height: 48rpx;
+  background: linear-gradient(135deg, #4A90D9 0%, #357ABD 100%);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+/* 大按钮 */
+.btn-lg {
+  padding: 32rpx 48rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  border-radius: 16rpx;
+}
+
+/* 平台网格布局 - 使用 flex 替代 grid */
+.platform-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.platform-item {
+  width: 48%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12rpx;
+  padding: 24rpx 20rpx;
+  text-align: center;
+  transition: all 0.2s;
+  margin-bottom: 16rpx;
+}
+
+.platform-item:active {
+  transform: scale(0.97);
+}
+
+.platform-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.platform-status {
+  font-size: 22rpx;
+}
+
+.status-ok {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.status-dev {
+  color: #999;
+}
+
+/* 底部留白 */
+.bottom-space {
+  height: 150rpx;
+}
+
+/* 浮动按钮 - FAB */
+.fab-btn {
+  position: fixed;
+  right: 30rpx;
+  bottom: 120rpx;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+  border-radius: 50rpx;
+  padding: 20rpx 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 32rpx rgba(255, 107, 107, 0.4);
+  z-index: 999;
+  transition: all 0.2s;
+  animation: fab-pulse 2s infinite;
+}
+
+.fab-btn:active {
+  transform: scale(0.95);
+}
+
+.fab-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fab-icon {
+  font-size: 36rpx;
+  margin-bottom: 4rpx;
+}
+
+.fab-text {
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@keyframes fab-pulse {
+  0%, 100% {
+    box-shadow: 0 8rpx 32rpx rgba(255, 107, 107, 0.4);
+  }
+  50% {
+    box-shadow: 0 8rpx 48rpx rgba(255, 107, 107, 0.7);
+  }
+}
+
+/* 服务设置卡片 */
+.settings-card {
+  background-color: #f8f9fa;
+  border: 2rpx solid #e9ecef;
+}
+
+.settings-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.settings-input {
+  flex: 1;
+  border: 2rpx solid #dee2e6;
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  font-size: 26rpx;
+  background-color: #fff;
+}
+
+.settings-btn {
+  width: 100%;
+  font-size: 28rpx;
+  padding: 16rpx;
+  margin-bottom: 12rpx;
+}
+
+.text-success {
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.text-error {
+  color: #f44336;
+  font-weight: 500;
+}
+
+.settings-tip {
+  background-color: #e3f2fd;
+  border-radius: 8rpx;
+  padding: 16rpx;
+  display: block;
+  line-height: 1.5;
+  color: #1976d2;
+}

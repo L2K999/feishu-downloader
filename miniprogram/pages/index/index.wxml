@@ -1,0 +1,163 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">
+      <text>云文档链接</text>
+    </view>
+    <view class="text-muted text-sm mb-sm">
+      支持：飞书、钉钉、Notion、语雀、腾讯文档、Google Docs
+    </view>
+
+    <view wx:if="{{!isBatchMode}}">
+      <input 
+        class="input-field"
+        placeholder="粘贴云文档链接"
+        value="{{inputUrl}}"
+        bindinput="onUrlInput"
+        confirm-type="done"
+      />
+      <view class="mt-md">
+        <button 
+          class="btn-primary" 
+          bindtap="parseUrl"
+          disabled="{{!inputUrl}}"
+        >解析链接</button>
+      </view>
+    </view>
+
+    <view wx:else>
+      <view wx:for="{{batchUrls}}" wx:key="index" class="flex-row mb-sm">
+        <input 
+          class="input-field"
+          placeholder="链接 {{index + 1}}"
+          value="{{item}}"
+          bindinput="onBatchUrlInput"
+          data-index="{{index}}"
+          style="flex: 1;"
+        />
+        <view 
+          wx:if="{{batchUrls.length > 1}}"
+          class="btn-secondary" 
+          bindtap="removeBatchUrl"
+          data-index="{{index}}"
+          style="margin-left: 16rpx; padding: 16rpx 24rpx; font-size: 24rpx;"
+        >删除</view>
+      </view>
+      <view class="flex-row mt-sm">
+        <view class="btn-secondary" bindtap="addBatchUrl" style="padding: 16rpx 32rpx; font-size: 26rpx;">
+          <text>+ 添加链接</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="mt-lg">
+      <view class="btn-mode-switch" bindtap="toggleBatchMode">
+        <text class="btn-mode-icon">{{isBatchMode ? '↩' : '📋'}}</text>
+        <text class="btn-mode-text">{{isBatchMode ? '← 返回单链接模式' : '批量模式（支持多个链接）→'}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{parsedInfo && !isBatchMode}}" class="card">
+    <view class="section-title">文档信息</view>
+    <view class="flex-row mb-sm">
+      <text class="tag tag-feishu">{{parsedInfo.platformLabel}}</text>
+      <text class="text-muted">{{parsedInfo.type}} 类型</text>
+      <text wx:if="{{!parsedInfo.supported}}" class="text-muted" style="color: #f44336; margin-left: 16rpx;">暂不支持</text>
+    </view>
+    <view class="text-sm">Token: {{parsedInfo.token}}</view>
+  </view>
+
+  <view wx:if="{{parsedInfo && !isBatchMode && parsedInfo.supported}}" class="card">
+    <view class="section-title">选择导出格式</view>
+    <view class="format-grid">
+      <view 
+        wx:for="{{supportedFormats}}" 
+        wx:key="value"
+        class="format-option {{selectedFormat === item.value ? 'format-selected' : ''}}"
+        bindtap="selectFormat"
+        data-format="{{item.value}}"
+      >
+        <view class="format-icon">{{item.icon || '📄'}}</view>
+        <view class="format-info">
+          <view class="format-label">{{item.label}}</view>
+          <view class="format-desc text-muted">{{item.desc}}</view>
+        </view>
+        <view wx:if="{{selectedFormat === item.value}}" class="format-check">✓</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{parsedInfo && !isBatchMode && parsedInfo.supported}}" class="mt-md">
+    <button 
+      class="{{isProcessing ? 'btn-disabled' : 'btn-primary btn-lg'}}"
+      bindtap="startDownload"
+      disabled="{{isProcessing}}"
+    >
+      {{isProcessing ? processingStatus : '开始下载'}}
+    </button>
+  </view>
+
+  <view wx:if="{{isBatchMode}}" class="mt-md">
+    <button 
+      class="{{isProcessing ? 'btn-disabled' : 'btn-primary btn-lg'}}"
+      bindtap="startBatchDownload"
+      disabled="{{isProcessing}}"
+    >
+      {{isProcessing ? processingStatus : '开始批量下载'}}
+    </button>
+  </view>
+
+  <view wx:if="{{isProcessing}}" class="card">
+    <view class="text-center">
+      <view class="loading-spinner"></view>
+      <view class="mt-sm text-muted">{{processingStatus}}</view>
+    </view>
+  </view>
+
+  <view class="card mt-lg">
+    <view class="section-title">支持的平台</view>
+    <view class="platform-grid">
+      <view wx:for="{{supportedPlatforms}}" wx:key="name" class="platform-item">
+        <view class="platform-name">{{item.label}}</view>
+        <view wx:if="{{item.supported}}" class="platform-status status-ok">✓ 支持</view>
+        <view wx:else class="platform-status status-dev">开发中</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 服务设置卡片 -->
+  <view class="card settings-card">
+    <view class="section-title">服务设置</view>
+    <view class="settings-info">
+      <text class="text-sm">后端地址：</text>
+      <input 
+        class="settings-input"
+        placeholder="https://your-server.com"
+        value="{{serverUrlInput}}"
+        bindinput="onServerUrlInput"
+      />
+    </view>
+    <view class="mt-sm">
+      <button class="btn-secondary settings-btn" bindtap="saveServerUrl">保存地址</button>
+    </view>
+    <view class="mt-sm">
+      <button class="btn-secondary settings-btn" bindtap="testConnection">测试连接</button>
+    </view>
+    <view wx:if="{{connectionStatus}}" class="text-sm mt-sm {{connectionOk ? 'text-success' : 'text-error'}}">
+      {{connectionStatus}}
+    </view>
+    <view class="text-muted text-sm mt-sm settings-tip">
+      💡 后端服务负责处理各平台的文档导出，地址由管理员配置
+    </view>
+  </view>
+
+  <view class="bottom-space"></view>
+</view>
+
+<!-- 右下角浮动按钮 -->
+<view class="fab-btn" bindtap="openFeedback">
+  <view class="fab-content">
+    <text class="fab-icon">💡</text>
+    <text class="fab-text">优化建议</text>
+  </view>
+</view>

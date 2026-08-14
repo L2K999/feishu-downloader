@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: cloud-doc-downloader
+    runtime: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: node server/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      # 以下为各平台 API 密钥，请在 Render 控制台手动配置
+      # - key: FEISHU_APP_ID
+      # - key: FEISHU_APP_SECRET
+      # - key: NOTION_API_KEY
+      # - key: YUQUE_AUTH_TOKEN

@@ -1,0 +1,58 @@
+/* 反馈类型选择 - 使用 flex 替代 grid */
+.type-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.type-item {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 2rpx solid #e9ecef;
+  border-radius: 16rpx;
+  padding: 28rpx 16rpx;
+  transition: all 0.2s;
+  margin-bottom: 16rpx;
+}
+
+.type-item.type-selected {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+  border-color: #4A90D9;
+  box-shadow: 0 4rpx 12rpx rgba(74, 144, 217, 0.15);
+}
+
+.type-icon {
+  font-size: 48rpx;
+  margin-bottom: 12rpx;
+}
+
+.type-label {
+  font-size: 26rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+/* 文本域 */
+.textarea-field {
+  background-color: #f8f9fa;
+  border: 2rpx solid #e9ecef;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  width: 100%;
+  min-height: 240rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+.textarea-field:focus {
+  border-color: #4A90D9;
+  background-color: #fff;
+}
+
+.text-right {
+  text-align: right;
+}

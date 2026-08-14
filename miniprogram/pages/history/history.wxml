@@ -1,0 +1,64 @@
+<view class="container">
+  <view wx:if="{{isEmpty}}" class="empty-state">
+    <view class="empty-icon">📥</view>
+    <view class="empty-text">还没有下载记录</view>
+    <view class="text-muted">快去下载云文档吧！</view>
+  </view>
+
+  <view wx:else>
+    <view class="flex-between mb-md">
+      <view class="section-title" style="margin-bottom: 0;">下载记录 ({{history.length}})</view>
+      <view class="btn-secondary" bindtap="clearAll" style="padding: 12rpx 24rpx; font-size: 24rpx;">清空全部</view>
+    </view>
+
+    <view wx:for="{{history}}" wx:key="id" class="card history-item">
+      <view class="flex-between mb-sm">
+        <view class="flex-row" style="flex: 1;">
+          <text class="tag tag-feishu">{{item.format}}</text>
+          <text class="text-sm" style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{item.name}}</text>
+        </view>
+        <text class="{{item.statusInfo.class}}">{{item.statusInfo.text}}</text>
+      </view>
+
+      <view class="text-muted text-sm mb-sm">{{item.url}}</view>
+
+      <view class="flex-between">
+        <text class="text-muted text-sm">{{item.timeStr}}</text>
+        <view class="flex-row">
+          <view 
+            wx:if="{{item.content}}"
+            class="btn-secondary" 
+            bindtap="viewFile" 
+            data-id="{{item.id}}"
+            style="padding: 12rpx 20rpx; font-size: 24rpx; margin-right: 12rpx;"
+          >查看</view>
+          <view 
+            wx:if="{{item.content}}"
+            class="btn-secondary" 
+            bindtap="copyContent" 
+            data-id="{{item.id}}"
+            style="padding: 12rpx 20rpx; font-size: 24rpx; margin-right: 12rpx;"
+          >复制</view>
+          <view 
+            class="btn-secondary" 
+            bindtap="deleteRecord" 
+            data-id="{{item.id}}"
+            style="padding: 12rpx 20rpx; font-size: 24rpx;"
+          >删除</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{previewContent}}" class="preview-modal" bindtap="closePreview">
+    <view class="preview-content" catchtap="">
+      <view class="flex-between mb-md">
+        <view class="section-title">Markdown 内容</view>
+        <view class="btn-secondary" bindtap="closePreview" style="padding: 8rpx 20rpx; font-size: 24rpx;">关闭</view>
+      </view>
+      <scroll-view scroll-y style="max-height: 60vh;">
+        <text class="markdown-text">{{previewContent}}</text>
+      </scroll-view>
+    </view>
+  </view>
+</view>
