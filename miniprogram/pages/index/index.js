@@ -14,18 +14,14 @@ Page({
     supportedPlatforms: [],
     serverUrlInput: '',
     connectionStatus: '',
-    connectionOk: false,
-    useCloud: false,
-    cloudEnvId: ''
+    connectionOk: false
   },
 
   onLoad() {
     var app = getApp();
     this.setData({
       supportedPlatforms: SUPPORTED_PLATFORMS,
-      serverUrlInput: app.globalData.serverUrl,
-      useCloud: app.globalData.useCloud,
-      cloudEnvId: app.globalData.cloudEnvId
+      serverUrlInput: app.globalData.serverUrl
     });
   },
 

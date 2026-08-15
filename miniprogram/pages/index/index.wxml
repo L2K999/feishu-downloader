@@ -129,18 +129,10 @@
   <view class="card settings-card">
     <view class="section-title">服务设置</view>
     <view class="settings-info">
-      <text class="text-sm">云托管：</text>
-      <text class="text-sm {{useCloud ? 'text-success' : 'text-error'}}">{{useCloud ? '已启用' : '未启用'}}</text>
-    </view>
-    <view wx:if="{{useCloud}}" class="settings-info">
-      <text class="text-sm">云环境：</text>
-      <text class="text-sm debug-url">{{cloudEnvId}}</text>
-    </view>
-    <view class="settings-info">
-      <text class="text-sm">备有地址：</text>
+      <text class="text-sm">服务地址：</text>
       <input 
         class="settings-input"
-        placeholder="http://localhost:3000"
+        placeholder="https://cloud-doc-downloader.onrender.com"
         value="{{serverUrlInput}}"
         bindinput="onServerUrlInput"
       />
@@ -155,7 +147,7 @@
       {{connectionStatus}}
     </view>
     <view class="text-muted text-sm mt-sm settings-tip">
-      💡 云托管模式下小程序无需配置域名白名单。备有地址用于本地调试降级。
+      💡 部署后端服务后，在此填入服务地址即可使用
     </view>
   </view>
 

@@ -1,18 +1,28 @@
+# Render Blueprint 配置
+# 文档: https://render.com/docs/blueprint-spec
 services:
   - type: web
     name: cloud-doc-downloader
     runtime: node
     plan: free
+    # 构建上下文为仓库根目录，安装 server 目录下的依赖
     buildCommand: cd server && npm install
+    # 从根目录启动
     startCommand: node server/server.js
     healthCheckPath: /api/health
+    # Render 会自动注入 PORT 环境变量，无需手动设置
+    autoDeploy: true
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
-      # 以下为各平台 API 密钥，请在 Render 控制台手动配置
+      # 各平台 API 密钥请在 Render 控制台手动配置（Environment 标签）
       # - key: FEISHU_APP_ID
       # - key: FEISHU_APP_SECRET
       # - key: NOTION_API_KEY
+      # - key: DINGTALK_APP_KEY
+      # - key: DINGTALK_APP_SECRET
       # - key: YUQUE_AUTH_TOKEN
+      # - key: TENCENT_CLIENT_ID
+      # - key: TENCENT_CLIENT_SECRET
+      # - key: GOOGLE_CLIENT_ID
+      # - key: GOOGLE_CLIENT_SECRET
