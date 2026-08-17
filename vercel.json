@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "buildCommand": "cd server && npm install",
+  "installCommand": "cd server && npm install",
+  "functions": {
+    "api/server.js": {
+      "includeFiles": "server/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/server.js"
+    }
+  ]
+}

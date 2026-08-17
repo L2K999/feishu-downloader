@@ -1,0 +1,5 @@
+# Vercel 部署配置
+# 注册地址: https://vercel.com
+buildCommand: cd server && npm install
+outputDirectory: server
+installCommand: cd server && npm install

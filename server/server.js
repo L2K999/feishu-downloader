@@ -51,11 +51,17 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`========================================`);
-  console.log(`  云文档下载器后端服务`);
-  console.log(`  Server running on port ${PORT}`);
-  console.log(`  平台: 飞书 | 钉钉 | Notion | 语雀 | 腾讯文档 | Google Docs`);
-  console.log(`  反馈 API: /api/feedback`);
-  console.log(`========================================`);
-});
+if (process.env.VERCEL) {
+  // Vercel Serverless 模式：导出 app，不调用 listen
+  module.exports = app;
+} else {
+  // 本地/传统服务器模式
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`========================================`);
+    console.log(`  云文档下载器后端服务`);
+    console.log(`  Server running on port ${PORT}`);
+    console.log(`  平台: 飞书 | 钉钉 | Notion | 语雀 | 腾讯文档 | Google Docs`);
+    console.log(`  反馈 API: /api/feedback`);
+    console.log(`========================================`);
+  });
+}
